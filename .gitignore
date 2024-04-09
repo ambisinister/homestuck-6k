@@ -9,3 +9,5 @@ data/screens/
 
 data/figures/*.csv
 data/figures/*.png
+
+*.org
