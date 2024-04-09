@@ -1,0 +1,11 @@
+__pycache__/
+logs/
+results/
+results_try1/
+venv/
+
+data/clip_dataset
+data/screens/
+
+data/figures/*.csv
+data/figures/*.png

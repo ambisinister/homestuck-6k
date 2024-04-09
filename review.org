@@ -1,0 +1,89 @@
+#+TITLE: ComiCLIP: Contrastive Language-Image Pretraining on Webcomic Images
+#+AUTHOR: Eryk Banatt
+
+* Abstract
+
+Contrastive Language Image Pretraining, or CLIP, is a technique developed in 2021 by OpenAI. The primary purpose of CLIP is to create a joint embedding between an image encoder and a text encoder, so that the text encoder's embedding for a description of an image is roughly the same as an image encoder's embedding for the image being described. CLIP has many uses, both regarding applications for a shared text-image embedding, and regarding the method of aligning two encoders from different domains to produce matching embeddings on training data pairs. In this work, we create a novel image captioning dataset based on a popular internet webcomic /Homestuck/, and finetune CLIP to demonstrate the technique's applicability upon data out-of-distribution relative to the original dataset (i.e. real world photographs).
+
+* Literature Review
+
+
+** Automatic Image Captioning
+
+CLIP can be considered an instance of /automatic image captioning/, a field which has a substantial history predating the release of CLIP. ConVIRT (???, 2020) used a dual-encoder architecture to match images and text together. VisualBERT (???, 2019) learned a joint visual-linguistic representation for more narrow Question Answering tasks. ALIGN (???, 2021) was a larger model intended for zero-shot transfer learning from joint image-text representation, and is the closest conceptually to OpenAI's CLIP. It Differs because ???. In comparison, CLIP trained a joint representation between a text encoder and an image encoder, ???.
+
+** Downstream Works of CLIP
+
+CLIP is one of the most highly cited papers in recent memory, both because of it's substantial use in image-and-text applications, and because of it's simple and flexible method for aligning encoders between two domains.
+
+One of the most prominent applications of CLIP is image generation models, especially diffusion models. DALL-E (OpenAI, 2021) use a 12 billion parameter version of CLIP to create one of the earliest prompt-driven image generation models, which later turned into more efficient methods like Latent Diffusion (???, 2022). Of special note here is Google's Imagen (2022), which uses a frozen pretrained large language model, and trains an image encoder to match it instead of training both encoders jointly. 
+
+Likewise, many improvements to vanilla CLIP have been proposed and demonstrated since OpenAI's original implementation. These include methods for enhanced data efficiency and distribution shift (???, 2022), bootstrapping-driven training procedures (???, 2022), training methods arguing for different activation functions (???, 2023), and methods to hook CLIP to language models for question answering purposes (???, 2022). Given the shift to multimodal training in recent years (probably needs a citation, gptV mini?), CLIP's influence remains substantial to this day.
+
+** Aligning Two Domains
+
+CLIP as a general-purpose template for training joint embeddings between two domains has had substantial influence beyond it's capabilities as a released model. Contrastive pretraining between paired data has been shown to be extremely powerful even when the two domains differ substantially. As such, CLIP can be thought of as influencing the research landscape in two ways: first as a demonstration of tightly coupled image-text pairs, and second as a blueprint for aligning any two modalities.
+
+Some examples of CLIP-style pretraining for other modalities includes, Text + Neural Radiance Fields (NeRFs) (???, 2022), Speech + Images (???, 2022), Text + Audio (???, 2021) (???, 2022), Audio + Video (???, 2023), Text + Motion (???, 2023), Text + 3D Mesh (???, 2021), and Text + Goal-Oriented Actions in Video (???, 2022). 
+
+
+
+
+* References
+
+openCLIP
+
+https://github.com/mlfoundations/open_clip
+
+finetune clip repo
+
+https://github.com/damian0815/finetune-clip-huggingface
+
+Before CLIP:
+
+ConVIRT (2020): Learned to match images and text through contrastive learning, but used a dual-encoder architecture rather than CLIP's unified image-text encoder. https://arxiv.org/pdf/2010.00747.pdf
+VisualBERT (2019) and ViLBERT (2020): Used transformers to learn joint visual-linguistic representations for tasks like visual question answering, but required more task-specific fine-tuning than CLIP. https://arxiv.org/pdf/1908.03557.pdf
+ALIGN (2021): Scaled up the dataset and model size for learning image-text representations, achieving strong zero-shot transfer performance prior to CLIP's release. https://arxiv.org/pdf/2102.05918.pdf
+
+
+CLIP: https://arxiv.org/pdf/2103.00020.pdf
+
+After CLIP:
+
+DALL-E (2021): Used a 12-billion parameter version of CLIP to guide text-to-image generation in a transformer language model. https://arxiv.org/pdf/2102.12092.pdf
+Latent Diffusion Models (2022): Stable Diffusion progenitor, similar to DALL-E but diffusion performed in latent space rather than pixel space https://arxiv.org/pdf/2112.10752.pdf
+Imagen (2022): Like DALL-E and Latent Diffusion, but showed that large pretrained language model is better than an aligned CLIP text encoder https://arxiv.org/pdf/2205.11487.pdf
+
+DeCLIP (2022): Data Efficient Clip, Proposed improvements to CLIP training to enhance robustness to distribution shift. https://arxiv.org/pdf/2110.05208.pdf
+Flamingo (2022): Combined frozen CLIP visual representations with a large language model for few-shot visual question answering and other tasks. https://arxiv.org/pdf/2204.14198.pdf
+BLIP (2022): Bootstrapped clip, Scaled up CLIP-like contrastive pretraining and introduced new techniques for visual-linguistic alignment and knowledge distillation. https://arxiv.org/pdf/2201.12086.pdf
+SigLIP (2023): Claim that sigmoid is superior to activation for CLIP pretraining, interesting work downstream  https://arxiv.org/pdf/2303.15343.pdf
+
+other modalities
+
+CLIP-NeRF (2022): Incorporated CLIP embeddings into Neural Radiance Fields (NeRF) to manipulate 3D object representations based on natural language. https://arxiv.org/pdf/2112.05139.pdf
+
+Speech and Images:
+SpeechCLIP (2022): Learns aligned representations of speech and images using a CLIP-like framework, enabling speech-based image retrieval and clustering. https://arxiv.org/pdf/2210.00705.pdf
+
+Text and Audio:
+AudioCLIP (2021): Trains a CLIP-like model on audio-caption pairs to learn aligned representations of environmental sounds and text descriptions. https://arxiv.org/pdf/2106.13043.pdf
+WAV2CLIP (2022): Generates images from sound input with clip like framing https://arxiv.org/pdf/2110.11499.pdf
+
+Audio and Video:
+V-MusProd (2023): Background music paired with video clips, no language at all https://openaccess.thecvf.com/content/ICCV2023/papers/Zhuo_Video_Background_Music_Generation_Dataset_Method_and_Evaluation_ICCV_2023_paper.pdf
+
+
+Text and Motion:
+MotionGPT (2023): https://arxiv.org/pdf/2306.14795.pdf
+
+Text and 3D Mesh:
+Text2Mesh (2021): https://arxiv.org/pdf/2112.03221.pdf
+
+
+Text and Goal:
+MINEDOJO (MineCLIP) (2022): CLIP between text labels of goals and short video sequences of an agent accomplishing those goals https://arxiv.org/pdf/2206.08853.pdf
+
+
+Homestuck accessbile screen reader w/ image descriptions
+https://archiveofourown.org/works/14289270/chapters/32962827

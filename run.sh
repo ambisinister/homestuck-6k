@@ -1,0 +1,20 @@
+python3 finetune.py \
+    --output_dir "./results" \
+    --model_name_or_path "openai/clip-vit-large-patch14-336" \
+    --train_file "./data/clip_dataset/train.json" \
+    --validation_file "./data/clip_dataset/val.json" \
+    --logging_dir="./logs" \
+    --logging_steps=100 \
+    --evaluation_strategy="steps" \
+    --eval_steps=100 \
+    --report_to="tensorboard" \
+    --image_column image \
+    --overwrite_output_dir=True \
+    --max_seq_length=77 \
+    --num_train_epochs=2 \
+    --caption_column caption \
+    --remove_unused_columns=False \
+    --do_train \
+    --do_eval \
+    --per_device_train_batch_size=8 \
+    --learning_rate="5e-5" --warmup_steps="0" --weight_decay 0.1 
