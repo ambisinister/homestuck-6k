@@ -73,7 +73,7 @@ values, indices = torch.topk(dot_similarity.squeeze(0), 9)
 fig, axs = plt.subplots(3, 3, figsize=(15, 15))
 plt.title("Finetune Query: Trolls")
 for i, idx in enumerate(indices):
-    image_path = test_dataset[450+int(idx)]['image'] 
+    image_path = test_dataset[int(idx)]['image'] 
     image = Image.open(image_path)
 
     axs[i // 3, i % 3].imshow(image)

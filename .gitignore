@@ -11,3 +11,5 @@ data/figures/*.csv
 data/figures/*.png
 
 *.org
+
+.DS_Store
