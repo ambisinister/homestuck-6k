@@ -11,5 +11,6 @@ data/figures/*.csv
 data/figures/*.png
 
 *.org
+*.pth
 
 .DS_Store
