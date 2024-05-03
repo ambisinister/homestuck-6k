@@ -28,8 +28,8 @@ class TextEnc(nn.Module):
     def forward(self, text):
         encoded_text = self.tokenizer(text, padding=True,
                                       truncation=True, return_tensors='pt')
-        out = self.model(input_ids=encoded_text['input_ids'],
-                         attention_mask=encoded_text['attention_mask'])
+        out = self.model(input_ids=encoded_text['input_ids'].to("cuda"),
+                         attention_mask=encoded_text['attention_mask'].to("cuda"))
         last_hidden_state = out.last_hidden_state
         return last_hidden_state[:, self.target_token_idx, :]
 

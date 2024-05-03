@@ -7,9 +7,11 @@ import torch.nn.functional as F
 from tqdm import tqdm
 import pickle
 
+import schedulefree
+
 # local
 from models import CLIP
-from clip_dataset import DummyDataset, CLIPDataset
+from clip_dataset import CLIPDataset, show_first_image
 
 def train(model, trainloader, valloader, optim, criterion, lr_scheduler,
           step='batch', epochs=3, temp=1.0):
@@ -20,10 +22,12 @@ def train(model, trainloader, valloader, optim, criterion, lr_scheduler,
         print(f"Begin epoch {epoch+1}")
         # Training
         model.train()
+        optim.train()
         train_loss = 0.0
         progress_bar = tqdm(trainloader, desc=f"Epoch {epoch+1} (Training)", unit="batch")
         
-        for i, batch in enumerate(progress_bar): 
+        for i, batch in enumerate(progress_bar):
+            batch['img'] = batch['img'].to("cuda")
             im_embeds, txt_embeds = model(batch)
             im_logits = im_embeds @ txt_embeds.T / temp
             txt_logits = txt_embeds @ im_embeds.T / temp
@@ -49,10 +53,12 @@ def train(model, trainloader, valloader, optim, criterion, lr_scheduler,
 
         # Validation
         model.eval()
+        optim.eval()
         val_loss = 0.0
         with torch.no_grad():
             progress_bar = tqdm(valloader, desc=f"Epoch {epoch+1} (Validation)", unit="batch")
             for i, batch in enumerate(progress_bar):
+                batch['img'] = batch['img'].to("cuda")
                 im_embeds, txt_embeds = model(batch)
                 im_logits = im_embeds @ txt_embeds.T / temp
                 txt_logits = txt_embeds @ im_embeds.T / temp
@@ -72,24 +78,30 @@ def train(model, trainloader, valloader, optim, criterion, lr_scheduler,
         print(f"Epoch {epoch+1}: Train Loss = {avg_train_loss:.4f}, Val Loss = {avg_val_loss:.4f}")
 
         # checkpoint
-        checkpoint_path = f'./checkpoints/checkpoint_{epoch+1}.pth'
-        torch.save(model.state_dict(), checkpoint_path)
+        if epoch+1 % 5 == 0:
+            checkpoint_path = f'./checkpoints/checkpoint_{epoch+1}.pth'
+            torch.save(model.state_dict(), checkpoint_path)
     
-    return model, train_losses, val_losses 
+    return model, train_losses, val_losses
 
 if __name__ == '__main__':
     clip = CLIP()
+    clip.to("cuda")
     batch_size = 32
     train_dataset = CLIPDataset('../data/clip_dataset/train.json')
     val_dataset = CLIPDataset('../data/clip_dataset/val.json')
-    trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size)
-    valloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size)
+    trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    valloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+
+    #show_first_image(trainloader)
+    #show_first_image(valloader)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(clip.parameters(), lr=1e-3)
+    #optimizer = optim.Adam(clip.parameters(), lr=1e-3)
+    optimizer = schedulefree.AdamWScheduleFree(clip.parameters(), lr=3e-4)
     lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
     trained_clip, train_loss, val_loss = train(clip, trainloader, valloader,
-                                               optimizer, criterion, lr_scheduler, epochs=5)
+                                               optimizer, criterion, lr_scheduler, epochs=10)
 
     save_path = 'DIY_CLIP.pth'
     torch.save(trained_clip.state_dict(), save_path)

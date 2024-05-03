@@ -2,6 +2,7 @@ import json
 import torch
 from PIL import Image
 from torchvision import transforms
+import matplotlib.pyplot as plt
 
 class DummyDataset(torch.utils.data.Dataset):
     def __init__(self, num_examples):
@@ -51,3 +52,21 @@ class CLIPDataset(torch.utils.data.Dataset):
             'text': caption
         }
     
+
+def show_first_image(dataloader):
+    data_iter = iter(dataloader)
+    batch = next(data_iter)
+    img = batch['img'][0]  # First image in the batch
+    caption = batch['text'][0]  # Corresponding caption
+
+    # unnormalize
+    mean = torch.tensor([0.485, 0.456, 0.406])
+    std = torch.tensor([0.229, 0.224, 0.225])
+    img = img * std[:, None, None] + mean[:, None, None]
+    img = img.permute(1, 2, 0)
+
+    plt.figure(figsize=(8, 8))
+    plt.imshow(img)
+    plt.title(caption)
+    plt.axis('off')
+    plt.show()
